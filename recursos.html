@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recursos — Red Segura</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="telefono">
+
+  <header>
+    <button class="back-btn" onclick="history.back()">‹</button>
+    <span class="icono-header">📚</span>
+    <h2>Recursos de ayuda</h2>
+  </header>
+
+  <div class="contenido">
+
+    <section class="resources-header">
+      <div>
+        <span class="resources-pill">24/7</span>
+        <h3>Servicios disponibles</h3>
+      </div>
+      <p>
+        Estos recursos están disponibles las 24 horas. Toca cada opción para obtener más información.
+      </p>
+    </section>
+
+    <div id="resourceDetail" class="resource-detail hidden">
+      <button class="resource-back" onclick="cerrarDetalle()">‹ Volver</button>
+      <div class="resource-detail-card">
+        <div class="resource-detail-icon" id="detailIcon">📞</div>
+        <h3 id="detailTitle">Título</h3>
+        <p id="detailDescription">Descripción</p>
+        <div class="resource-detail-meta">
+          <span id="detailHours">Horario</span>
+          <span id="detailType">Tipo</span>
+        </div>
+        <div class="resource-detail-extra">
+          <h4>Qué hacer ahora</h4>
+          <p id="detailSteps">Pasos recomendados</p>
+        </div>
+        <div class="resource-detail-extra">
+          <h4>Consejo de seguridad</h4>
+          <p id="detailAdvice">Recomendación importante</p>
+        </div>
+        <div class="resource-detail-actions">
+          <a class="detail-action primary" id="detailCall" href="#" target="_blank" rel="noopener noreferrer">Abrir sitio web</a>
+          <button class="detail-action secondary" onclick="cerrarDetalle()">Cerrar</button>
+        </div>
+      </div>
+    </div>
+
+    <ul class="lista-recursos" id="listaRecursos">
+      <li class="resource-card" data-title="Línea 100" data-description="Servicio gratuito para atención inmediata ante violencia familiar o sexual, con orientación y apoyo confidencial." data-hours="24 horas" data-type="Llamada telefónica" data-icon="📞" data-call="Abrir sitio web" data-link="https://www.gob.pe/100" data-phone="100" data-steps="1) Busca un lugar seguro. 2) Mantén la calma y explica lo que ocurre. 3) Si es una emergencia, pide ayuda inmediata a alguien cercano." data-advice="No compartas tu ubicación ni detalles sensibles si no te sientes cómoda; puedes pedir apoyo sin dar información completa.">
+        <div class="resource-icon">📞</div>
+        <div class="resource-info">
+          <strong>Línea 100</strong>
+          <span>Violencia familiar y sexual</span>
+        </div>
+        <span class="resource-action">Más información</span>
+      </li>
+      <li class="resource-card" data-title="Centro de Emergencia Mujer" data-description="Atención integral y segura para casos de violencia de género, con orientación legal, médica y psicosocial." data-hours="24 horas" data-type="Atención presencial y telefónica" data-icon="🏥" data-call="Abrir sitio web" data-link="https://www.gob.pe/144" data-phone="144" data-steps="1) Describe tu situación con claridad. 2) Pide que te expliquen las opciones disponibles. 3) Solicita apoyo para un plan de seguridad." data-advice="Si tienes miedo de que te escuchen, habla en un lugar tranquilo y, si puedes, con alguien de confianza cerca.">
+        <div class="resource-icon">🏥</div>
+        <div class="resource-info">
+          <strong>Centro de Emergencia Mujer</strong>
+          <span>Atención integral y segura</span>
+        </div>
+        <span class="resource-action">Más información</span>
+      </li>
+      <li class="resource-card" data-title="Apoyo Psicológico" data-description="Espacios de escucha y acompañamiento emocional con profesionales capacitados para situaciones de crisis." data-hours="Lunes a domingo" data-type="Apoyo emocional" data-icon="🧠" data-call="Abrir sitio web" data-link="https://www.minsa.gob.pe/" data-phone="" data-steps="1) Indica si necesitas apoyo inmediato o seguimiento. 2) Explica cómo te sientes en este momento. 3) Pide recursos para cuidar tu bienestar." data-advice="No estás sola; hablar con alguien de confianza o un profesional puede ayudarte a organizarte y a sentirte más segura.">
+        <div class="resource-icon">🧠</div>
+        <div class="resource-info">
+          <strong>Apoyo Psicológico</strong>
+          <span>Profesionales disponibles</span>
+        </div>
+        <span class="resource-action">Más información</span>
+      </li>
+      <li class="resource-card" data-title="Refugios Temporales" data-description="Espacios de resguardo para personas que necesitan protección inmediata y apoyo para su seguridad." data-hours="Disponibilidad variable" data-type="Protección inmediata" data-icon="🏠" data-call="Abrir sitio web" data-link="https://www.mimp.gob.pe/" data-phone="" data-steps="1) Identifica una salida segura. 2) Lleva documentos, medicamentos y objetos esenciales. 3) Busca ayuda de personas de confianza o del servicio disponible." data-advice="Si puedes, guarda copias digitales de documentos importantes y mantén un plan simple para moverte con seguridad.">
+        <div class="resource-icon">🏠</div>
+        <div class="resource-info">
+          <strong>Refugios Temporales</strong>
+          <span>Lugares seguros para resguardarse</span>
+        </div>
+        <span class="resource-action">Más información</span>
+      </li>
+      <li class="resource-card" data-title="MIMP" data-description="Línea gratuita del Ministerio de la Mujer y Poblaciones Vulnerables para orientación y atención." data-hours="24 horas" data-type="Línea gratuita" data-icon="📲" data-call="Abrir sitio web" data-link="https://www.mimp.gob.pe/" data-phone="080022250" data-steps="1) Comunica tu necesidad de forma clara. 2) Solicita información sobre servicios y apoyo. 3) Pregunta qué pasos puedes seguir hoy." data-advice="Puedes llamar aunque no tengas todos los detalles; la prioridad es recibir orientación y apoyo en el momento.">
+        <div class="resource-icon">📲</div>
+        <div class="resource-info">
+          <strong>MIMP</strong>
+          <span>Línea gratuita 0800-22-250</span>
+        </div>
+        <span class="resource-action">Más información</span>
+      </li>
+    </ul>
+
+    <div class="estado resources-note">
+      <span>🔒</span>
+      Todos los servicios son gratuitos y confidenciales
+    </div>
+
+  </div>
+</div>
+
+<script>
+  function abrirDetalle(card) {
+    const detail = document.getElementById('resourceDetail');
+    const lista = document.getElementById('listaRecursos');
+    const detailIcon = document.getElementById('detailIcon');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailDescription = document.getElementById('detailDescription');
+    const detailHours = document.getElementById('detailHours');
+    const detailType = document.getElementById('detailType');
+    const detailSteps = document.getElementById('detailSteps');
+    const detailAdvice = document.getElementById('detailAdvice');
+    const detailCall = document.getElementById('detailCall');
+
+    if (!detail || !lista || !detailCall) return;
+
+    const numero = card.dataset.phone || '';
+    const url = card.dataset.link || '';
+
+    detailIcon.textContent = card.dataset.icon || '📌';
+    detailTitle.textContent = card.dataset.title || 'Recurso';
+    detailDescription.textContent = card.dataset.description || '';
+    detailHours.textContent = card.dataset.hours || '';
+    detailType.textContent = card.dataset.type || '';
+    detailSteps.textContent = card.dataset.steps || 'Te guiaremos con los próximos pasos.';
+    detailAdvice.textContent = card.dataset.advice || 'Mantente en un lugar seguro y pide apoyo si lo necesitas.';
+    detailCall.textContent = card.dataset.call || 'Abrir sitio web';
+    detailCall.href = url || (numero ? `tel:${numero}` : '#');
+    detailCall.target = url ? '_blank' : '_self';
+    detailCall.rel = url ? 'noopener noreferrer' : '';
+
+    detailCall.onclick = () => {
+      if (!url && !numero) {
+        alert('Este recurso puede requerir una guía adicional antes de abrirlo.');
+      }
+    };
+
+    lista.classList.add('hidden');
+    detail.classList.remove('hidden');
+  }
+
+  function cerrarDetalle() {
+    const detail = document.getElementById('resourceDetail');
+    const lista = document.getElementById('listaRecursos');
+    if (detail) detail.classList.add('hidden');
+    if (lista) lista.classList.remove('hidden');
+  }
+
+  document.querySelectorAll('.resource-card').forEach((card) => {
+    card.addEventListener('click', () => abrirDetalle(card));
+  });
+</script>
+
+</body>
+</html>

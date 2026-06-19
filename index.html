@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Red Segura</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* ══ SPLASH / INTRO SCREEN ══ */
+    #splash {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(circle at 20% 20%, rgba(95, 166, 255, 0.18), transparent 16%),
+        radial-gradient(circle at 80% 30%, rgba(84, 255, 209, 0.14), transparent 14%),
+        linear-gradient(145deg, #0d1b4b 0%, #1a56a0 55%, #0d3b7a 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      transition: opacity 0.6s ease, transform 0.6s ease;
+      overflow: hidden;
+    }
+
+    #splash::before,
+    #splash::after {
+      content: '';
+      position: absolute;
+      width: 240px;
+      height: 240px;
+      background: radial-gradient(circle, rgba(255,255,255,0.08), transparent 70%);
+      border-radius: 50%;
+      animation: moverFondo 10s ease-in-out infinite alternate;
+    }
+
+    #splash::before {
+      top: 8%;
+      left: 10%;
+    }
+
+    #splash::after {
+      bottom: 6%;
+      right: 12%;
+      animation-duration: 14s;
+    }
+
+    #splash.oculto {
+      opacity: 0;
+      transform: scale(1.04);
+      pointer-events: none;
+    }
+
+    .splash-orb {
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+      filter: blur(1px);
+      animation: flotando 6s ease-in-out infinite;
+    }
+
+    .orb-1 {
+      width: 84px;
+      height: 84px;
+      top: 18%;
+      left: 22%;
+    }
+
+    .orb-2 {
+      width: 56px;
+      height: 56px;
+      bottom: 26%;
+      left: 18%;
+      animation-delay: 1.2s;
+    }
+
+    .orb-3 {
+      width: 72px;
+      height: 72px;
+      top: 32%;
+      right: 18%;
+      animation-delay: 2s;
+    }
+
+    .splash-ring {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.08);
+      border: 2px solid rgba(255,255,255,0.18);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulsoAnillo 2.2s ease-in-out infinite;
+      position: relative;
+      margin-bottom: 28px;
+    }
+
+    .splash-ring::before {
+      content: '';
+      position: absolute;
+      inset: -12px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,0.08);
+      animation: pulsoAnillo 2.2s ease-in-out 0.4s infinite;
+    }
+
+    .splash-ring::after {
+      content: '';
+      position: absolute;
+      inset: -24px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.05);
+      animation: pulsoAnillo 2.2s ease-in-out 0.8s infinite;
+    }
+
+    .splash-icono {
+      font-size: 52px;
+      animation: latido 1.8s ease-in-out infinite;
+    }
+
+    .splash-titulo {
+      font-size: 34px;
+      font-weight: 800;
+      color: #ffffff;
+      letter-spacing: 1.5px;
+      margin-bottom: 8px;
+      animation: subirTexto 0.8s ease both;
+    }
+
+    .splash-subtitulo {
+      font-size: 14px;
+      color: rgba(255,255,255,0.65);
+      text-align: center;
+      max-width: 240px;
+      line-height: 1.5;
+      animation: subirTexto 0.8s 0.15s ease both;
+    }
+
+    .splash-barra {
+      margin-top: 48px;
+      width: 200px;
+      height: 4px;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      overflow: hidden;
+      animation: subirTexto 0.8s 0.3s ease both;
+    }
+
+    .splash-barra-fill {
+      height: 100%;
+      background: linear-gradient(90deg, rgba(255,255,255,0.6), #ffffff);
+      border-radius: 4px;
+      animation: cargaBarra 1.8s ease forwards;
+    }
+
+    .splash-tagline {
+      margin-top: 14px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      animation: subirTexto 0.8s 0.45s ease both;
+    }
+
+    @keyframes pulsoAnillo {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.06); opacity: 0.6; }
+    }
+
+    @keyframes latido {
+      0%, 100% { transform: scale(1); }
+      40% { transform: scale(1.12); }
+      60% { transform: scale(0.96); }
+    }
+
+    @keyframes subirTexto {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes cargaBarra {
+      from { width: 0%; }
+      to { width: 100%; }
+    }
+
+    @keyframes moverFondo {
+      from { transform: translate(0, 0) scale(1); }
+      to { transform: translate(25px, -18px) scale(1.15); }
+    }
+
+    @keyframes flotando {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-10px) scale(1.06); }
+    }
+
+    /* ══ HEADER MEJORADO ══ */
+    header {
+      background: linear-gradient(110deg, #0d1b4b 0%, #1a56a0 100%);
+      padding: 22px 20px 18px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    header::after {
+      content: '🛡️';
+      position: absolute;
+      right: -8px;
+      top: -10px;
+      font-size: 64px;
+      opacity: 0.07;
+      transform: rotate(15deg);
+    }
+
+    header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    header .icono-header { font-size: 24px; }
+
+    /* ══ HERO DENTRO DEL APP ══ */
+    .hero-card {
+      background: linear-gradient(135deg, #0d1b4b 0%, #1a56a0 100%);
+      border-radius: 18px;
+      padding: 22px 20px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 12px 24px rgba(10, 27, 66, 0.16);
+    }
+
+    .hero-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 28px rgba(10, 27, 66, 0.2);
+    }
+
+    .hero-card::before {
+      content: '';
+      position: absolute;
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+      right: -20px;
+      top: -20px;
+    }
+
+    .hero-card::after {
+      content: '';
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.07);
+      right: 30px;
+      bottom: -30px;
+    }
+
+    .hero-card .escudo {
+      font-size: 42px;
+      margin-bottom: 10px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.12), rgba(255,255,255,0.04));
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.18),
+        0 0 0 1px rgba(255,255,255,0.06),
+        0 8px 18px rgba(0,0,0,0.12);
+      animation: escudoFloat 3s ease-in-out infinite, brilloEscudo 2.8s ease-in-out infinite;
+      position: relative;
+      z-index: 1;
+      transform-origin: center;
+      filter: drop-shadow(0 0 10px rgba(79, 255, 176, 0.18));
+    }
+
+    .hero-card .escudo::before,
+    .hero-card .escudo::after {
+      content: '';
+      position: absolute;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+      z-index: -1;
+    }
+
+    .hero-card .escudo::before {
+      width: 74px;
+      height: 74px;
+      animation: pulseGlow 2.6s ease-in-out infinite;
+    }
+
+    .hero-card .escudo::after {
+      width: 92px;
+      height: 92px;
+      opacity: 0.18;
+      animation: pulseGlow 3.4s ease-in-out infinite reverse;
+    }
+
+    .hero-card h3 {
+      font-size: 20px;
+      font-weight: 800;
+      margin-bottom: 6px;
+      position: relative;
+    }
+
+    .hero-card p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.75);
+      line-height: 1.5;
+      position: relative;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.9);
+      margin-top: 10px;
+    }
+
+    .hero-badge .dot {
+      width: 7px;
+      height: 7px;
+      background: #4fffb0;
+      border-radius: 50%;
+      animation: parpadeoDot 1.5s ease-in-out infinite;
+    }
+
+    @keyframes parpadeoDot {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
+    }
+
+    @keyframes escudoFloat {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      50% { transform: translateY(-4px) rotate(2deg) scale(1.04); }
+    }
+
+    @keyframes brilloEscudo {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(79, 255, 176, 0.18)) brightness(1); }
+      50% { filter: drop-shadow(0 0 18px rgba(118, 208, 255, 0.32)) brightness(1.08); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% { transform: scale(1); opacity: 0.15; }
+      50% { transform: scale(1.15); opacity: 0.3; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ PANTALLA DE INICIO ══ -->
+<div id="splash">
+  <div class="splash-orb orb-1"></div>
+  <div class="splash-orb orb-2"></div>
+  <div class="splash-orb orb-3"></div>
+  <div class="splash-ring">
+    <span class="splash-icono">🛡️</span>
+  </div>
+  <div class="splash-titulo">Red Segura</div>
+  <div class="splash-subtitulo">Tu red de apoyo comunitario siempre activa</div>
+  <div class="splash-barra"><div class="splash-barra-fill"></div></div>
+  <div class="splash-tagline">Iniciando sistema…</div>
+</div>
+
+<!-- ══ APP PRINCIPAL ══ -->
+<div class="telefono" id="appPhone">
+
+  <header>
+    <span class="icono-header">🛡️</span>
+    <h2>Red Segura</h2>
+  </header>
+
+  <div class="contenido">
+
+    <!-- Hero card -->
+    <div class="hero-card">
+      <span class="escudo">🛡️</span>
+      <h3>Bienvenida/o</h3>
+      <p>No estás sola/o. Tu comunidad está aquí para protegerte y apoyarte.</p>
+      <div class="hero-badge">
+        <span class="dot"></span>
+        <span id="saludo">Sistema activo · Red conectada</span>
+      </div>
+    </div>
+
+    <section class="hero">
+      <div class="hero-content">
+        <span class="eyebrow">Centro de seguridad</span>
+        <h1>Red Segura</h1>
+        <p class="subtitulo">
+          Plataforma de asistencia y respuesta rápida para situaciones de emergencia.
+        </p>
+
+        <div class="hero-meta">
+          <span>🟢 Sistema operativo</span>
+          <span>📍 Ubicación activa</span>
+        </div>
+
+        <button class="sos" onclick="enviarSOS()">
+          🚨 Activar Alerta SOS
+        </button>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="panel-header">
+        <span>Estado actual</span>
+        <span class="panel-pill">Conectado</span>
+      </div>
+      <p id="estado">✅ Sistema activo</p>
+      <p id="ubicacion">📍 Ubicación no disponible</p>
+      <p id="contador">SOS enviados: 0</p>
+    </section>
+
+    <section class="historial">
+      <div class="historial-header">
+        <h3>Historial de Alertas</h3>
+        <span>Hoy</span>
+      </div>
+      <ul id="listaHistorial"></ul>
+    </section>
+
+    <div class="menu">
+      <a href="chat.html">
+        <button class="menu-btn">
+          <span class="icono">💬</span>
+          Chat de apoyo
+          <span class="flecha">›</span>
+        </button>
+      </a>
+      <a href="recursos.html">
+        <button class="menu-btn">
+          <span class="icono">📚</span>
+          Recursos de ayuda
+          <span class="flecha">›</span>
+        </button>
+      </a>
+      <a href="contactos.html">
+        <button class="menu-btn">
+          <span class="icono">👥</span>
+          Contactos seguros
+          <span class="flecha">›</span>
+        </button>
+      </a>
+    </div>
+
+    <div class="estado" id="estado">
+      ✅ Sistema activo
+    </div>
+
+  </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+  function actualizarSaludo() {
+    const saludo = document.getElementById('saludo');
+    if (!saludo) return;
+
+    const hora = new Date().getHours();
+    let texto = 'Sistema activo · Red conectada';
+
+    if (hora < 12) {
+      texto = 'Buenos días · Red lista para ayudarte';
+    } else if (hora < 19) {
+      texto = 'Buenas tardes · Red conectada';
+    } else {
+      texto = 'Buenas noches · Red activa';
+    }
+
+    saludo.textContent = texto;
+  }
+
+  actualizarSaludo();
+
+  // Ocultar splash después de que la barra cargue (~1.9s)
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    const appPhone = document.getElementById('appPhone');
+
+    if (splash) splash.classList.add('oculto');
+    if (appPhone) {
+      appPhone.classList.add('visible');
+    }
+
+    setTimeout(() => {
+      if (splash) splash.remove();
+    }, 650);
+  }, 1950);
+</script>
+</body>
+</html>

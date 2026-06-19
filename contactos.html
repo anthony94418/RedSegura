@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contactos — Red Segura</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<div class="telefono">
+
+  <header>
+    <button class="back-btn" onclick="history.back()">‹</button>
+    <span class="icono-header">👥</span>
+    <h2>Contactos seguros</h2>
+  </header>
+
+  <div class="contenido">
+
+    <section class="contacts-summary">
+      <div>
+        <span class="contacts-badge">Confianza</span>
+        <h3>Contactos de apoyo</h3>
+      </div>
+      <p>
+        Personas de confianza que serán alertadas en caso de emergencia.
+      </p>
+    </section>
+
+    <div class="lista-contactos" id="lista-contactos">
+
+      <div class="contacto-card">
+        <div class="avatar">R</div>
+        <div class="contacto-info">
+          <strong>Rodrigo</strong>
+          <span>915 984 208</span>
+        </div>
+        <div class="contacto-actions">
+          <span class="status-dot"></span>
+          <button class="llamar-btn" onclick="alert('Llamando a Rodrigo...')">📞</button>
+        </div>
+      </div>
+
+      <div class="contacto-card">
+        <div class="avatar">A</div>
+        <div class="contacto-info">
+          <strong>Anthony</strong>
+          <span>944 183 659</span>
+        </div>
+        <div class="contacto-actions">
+          <span class="status-dot"></span>
+          <button class="llamar-btn" onclick="alert('Llamando a Anthony...')">📞</button>
+        </div>
+      </div>
+
+      <div class="contacto-card">
+        <div class="avatar">I</div>
+        <div class="contacto-info">
+          <strong>Ibar</strong>
+          <span>916 030 819</span>
+        </div>
+        <div class="contacto-actions">
+          <span class="status-dot"></span>
+          <button class="llamar-btn" onclick="alert('Llamando a Ibar...')">📞</button>
+        </div>
+      </div>
+
+      <div class="contacto-card">
+        <div class="avatar">R</div>
+        <div class="contacto-info">
+          <strong>Rosseta</strong>
+          <span>915 984 208</span>
+        </div>
+        <div class="contacto-actions">
+          <span class="status-dot"></span>
+          <button class="llamar-btn" onclick="alert('Llamando a Rosseta...')">📞</button>
+        </div>
+      </div>
+
+      <div class="contacto-card">
+        <div class="avatar">R</div>
+        <div class="contacto-info">
+          <strong>Rouss</strong>
+          <span>915 984 208</span>
+        </div>
+        <div class="contacto-actions">
+          <span class="status-dot"></span>
+          <button class="llamar-btn" onclick="alert('Llamando a Rouss...')">📞</button>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="menu-btn add-contact-btn" onclick="alert('Función para agregar contacto próximamente')">
+      <span class="icono">➕</span>
+      Agregar contacto
+    </button>
+
+  </div>
+</div>
+
+</body>
+</html>
