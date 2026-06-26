@@ -3,72 +3,598 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chat de apoyo — Red Segura</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Red Segura — Chat de Apoyo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0f0f1a;
+      --surface:   #16162a;
+      --card:      #1e1e36;
+      --border:    #2e2e50;
+      --purple1:   #7c5cbf;
+      --purple2:   #a67cdc;
+      --pink:      #e05fa0;
+      --teal:      #3dd6c8;
+      --text:      #eeeaf8;
+      --muted:     #8880a8;
+      --bubble-ai: #1e1e36;
+      --bubble-me: linear-gradient(135deg, #7c5cbf, #e05fa0);
+      --glow:      rgba(124,92,191,.35);
+    }
+
+    body {
+      min-height: 100vh;
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+      overflow: hidden;
+    }
+
+    /* Ambient background orbs */
+    body::before, body::after {
+      content: '';
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      filter: blur(90px);
+      opacity: .35;
+    }
+    body::before {
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, #7c5cbf, transparent 70%);
+      top: -120px; left: -80px;
+    }
+    body::after {
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, #e05fa0, transparent 70%);
+      bottom: -100px; right: -60px;
+    }
+
+    /* ── Phone shell ── */
+    .shell {
+      width: 390px;
+      height: 820px;
+      background: var(--surface);
+      border-radius: 44px;
+      border: 1.5px solid var(--border);
+      box-shadow: 0 0 0 6px #0a0a12, 0 40px 100px rgba(0,0,0,.7), 0 0 60px var(--glow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* notch */
+    .shell::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 120px; height: 30px;
+      background: #0a0a12;
+      border-radius: 0 0 20px 20px;
+      z-index: 10;
+    }
+
+    /* ── Header ── */
+    header {
+      padding: 44px 20px 16px;
+      background: linear-gradient(180deg, #1a1a2e 0%, var(--surface) 100%);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    .back-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--purple2); font-size: 26px; line-height: 1;
+      padding: 4px 6px;
+      border-radius: 8px;
+      transition: background .2s;
+    }
+    .back-btn:hover { background: rgba(124,92,191,.15); }
+
+    .avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple1), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      box-shadow: 0 0 0 3px rgba(124,92,191,.3);
+      flex-shrink: 0;
+    }
+
+    .header-info { flex: 1; }
+    .header-info h2 {
+      font-size: 15px; font-weight: 600;
+      color: var(--text); letter-spacing: .2px;
+    }
+    .header-info .status {
+      font-size: 11px; color: var(--teal);
+      display: flex; align-items: center; gap: 4px; margin-top: 1px;
+    }
+    .status-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal);
+      animation: pulse-dot 2s infinite;
+    }
+    @keyframes pulse-dot {
+      0%,100% { box-shadow: 0 0 0 0 rgba(61,214,200,.5); }
+      50%      { box-shadow: 0 0 0 5px rgba(61,214,200,0); }
+    }
+
+    .header-actions { display: flex; gap: 6px; }
+    .icon-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--muted);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 14px;
+      transition: all .2s;
+    }
+    .icon-btn:hover { border-color: var(--purple2); color: var(--purple2); }
+
+    /* ── Emergency banner ── */
+    .banner {
+      margin: 10px 16px 0;
+      padding: 10px 14px;
+      background: linear-gradient(135deg, rgba(224,95,160,.15), rgba(124,92,191,.15));
+      border: 1px solid rgba(224,95,160,.3);
+      border-radius: 14px;
+      display: flex; align-items: center; gap: 10px;
+      cursor: pointer;
+      transition: all .25s;
+    }
+    .banner:hover { background: linear-gradient(135deg, rgba(224,95,160,.25), rgba(124,92,191,.25)); transform: scale(1.01); }
+    .banner-icon { font-size: 18px; }
+    .banner-text { flex: 1; }
+    .banner-text b { display: block; font-size: 12px; font-weight: 600; color: var(--pink); }
+    .banner-text span { font-size: 11px; color: var(--muted); }
+    .banner-arrow { color: var(--pink); font-size: 16px; }
+
+    /* ── Chat area ── */
+    .chat-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 16px 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      scroll-behavior: smooth;
+    }
+    .chat-area::-webkit-scrollbar { width: 4px; }
+    .chat-area::-webkit-scrollbar-track { background: transparent; }
+    .chat-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .date-sep {
+      text-align: center; font-size: 10px;
+      color: var(--muted); letter-spacing: .8px;
+      text-transform: uppercase; margin: 4px 0;
+    }
+
+    /* Bubbles */
+    .msg { display: flex; gap: 8px; align-items: flex-end; max-width: 100%; }
+    .msg.ai  { justify-content: flex-start; }
+    .msg.me  { justify-content: flex-end; }
+
+    .bubble-avatar {
+      width: 28px; height: 28px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, var(--purple1), var(--pink));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px;
+    }
+
+    .bubble {
+      max-width: 74%;
+      padding: 11px 14px;
+      border-radius: 18px;
+      font-size: 13.5px;
+      line-height: 1.55;
+      letter-spacing: .1px;
+      animation: pop-in .25s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    @keyframes pop-in {
+      from { transform: scale(.85); opacity: 0; }
+      to   { transform: scale(1);   opacity: 1; }
+    }
+
+    .msg.ai .bubble {
+      background: var(--card);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+    .msg.me .bubble {
+      background: var(--bubble-me);
+      color: #fff;
+      border-bottom-right-radius: 4px;
+      box-shadow: 0 4px 20px rgba(224,95,160,.35);
+    }
+
+    .bubble-time {
+      font-size: 10px; color: var(--muted);
+      margin-top: 3px;
+      padding: 0 4px;
+      text-align: right;
+    }
+    .msg.ai .bubble-time { text-align: left; padding-left: 36px; }
+
+    /* Typing indicator */
+    .typing-wrap { display: flex; gap: 8px; align-items: center; }
+    .typing-bubble {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      border-bottom-left-radius: 4px;
+      padding: 12px 16px;
+      display: flex; gap: 5px; align-items: center;
+    }
+    .typing-bubble span {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--purple2);
+      animation: typing-bounce 1.2s infinite;
+    }
+    .typing-bubble span:nth-child(2) { animation-delay: .2s; }
+    .typing-bubble span:nth-child(3) { animation-delay: .4s; }
+    @keyframes typing-bounce {
+      0%,60%,100% { transform: translateY(0); opacity:.4; }
+      30%           { transform: translateY(-6px); opacity:1; }
+    }
+    #typing-indicator { display: none; }
+
+    /* Quick replies */
+    .quick-replies {
+      padding: 6px 16px 6px;
+      display: flex; gap: 8px;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .quick-replies::-webkit-scrollbar { display: none; }
+    .qr-pill {
+      flex-shrink: 0;
+      padding: 7px 13px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px; color: var(--purple2);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all .2s;
+      font-family: 'Inter', sans-serif;
+    }
+    .qr-pill:hover {
+      background: rgba(124,92,191,.2);
+      border-color: var(--purple2);
+      transform: translateY(-1px);
+    }
+
+    /* ── Input bar ── */
+    .input-bar {
+      padding: 12px 16px 28px;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: center;
+    }
+
+    .input-wrap {
+      flex: 1;
+      background: var(--card);
+      border: 1.5px solid var(--border);
+      border-radius: 24px;
+      display: flex; align-items: center;
+      padding: 0 6px 0 16px;
+      gap: 6px;
+      transition: border-color .2s;
+    }
+    .input-wrap:focus-within {
+      border-color: var(--purple2);
+      box-shadow: 0 0 0 3px rgba(124,92,191,.15);
+    }
+
+    #msg-input {
+      flex: 1; background: none; border: none; outline: none;
+      color: var(--text); font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      padding: 12px 0;
+      min-width: 0;
+    }
+    #msg-input::placeholder { color: var(--muted); }
+
+    .emoji-btn {
+      background: none; border: none;
+      font-size: 18px; cursor: pointer;
+      color: var(--muted); padding: 4px;
+      transition: transform .2s;
+    }
+    .emoji-btn:hover { transform: scale(1.2); }
+
+    .send-btn {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--purple1), var(--pink));
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: all .2s;
+      box-shadow: 0 4px 15px rgba(224,95,160,.4);
+    }
+    .send-btn:hover { transform: scale(1.08); box-shadow: 0 6px 20px rgba(224,95,160,.6); }
+    .send-btn:active { transform: scale(.95); }
+    .send-btn svg { width:18px; height:18px; fill:none; stroke:#fff; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; }
+
+    /* Modal */
+    .modal-overlay {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,.7);
+      display: none; align-items: center; justify-content: center;
+      z-index: 100; border-radius: 44px;
+      backdrop-filter: blur(4px);
+    }
+    .modal-overlay.show { display: flex; }
+    .modal {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px 24px;
+      width: 320px;
+      text-align: center;
+      animation: pop-in .3s cubic-bezier(.34,1.56,.64,1) both;
+    }
+    .modal h3 { font-size: 18px; color: var(--text); margin-bottom: 8px; }
+    .modal p { font-size: 13px; color: var(--muted); line-height: 1.5; margin-bottom: 20px; }
+    .modal-numbers { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+    .modal-num {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 16px;
+      cursor: pointer;
+      transition: all .2s;
+      text-decoration: none;
+    }
+    .modal-num:hover { border-color: var(--purple2); background: rgba(124,92,191,.1); }
+    .modal-num .num-icon { font-size: 22px; }
+    .modal-num .num-info { text-align: left; }
+    .modal-num .num-label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .modal-num .num-desc { font-size: 11px; color: var(--muted); }
+    .modal-close {
+      background: none; border: 1px solid var(--border);
+      color: var(--muted); border-radius: 12px;
+      padding: 10px 24px; cursor: pointer;
+      font-size: 13px; font-family: 'Inter', sans-serif;
+      transition: all .2s; width: 100%;
+    }
+    .modal-close:hover { border-color: var(--muted); color: var(--text); }
+  </style>
 </head>
 <body>
 
-<div class="telefono">
+<div class="shell">
 
+  <!-- Emergency modal -->
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div style="font-size:36px;margin-bottom:12px">🆘</div>
+      <h3>Líneas de emergencia</h3>
+      <p>Estas líneas están disponibles 24/7 y son completamente gratuitas y confidenciales.</p>
+      <div class="modal-numbers">
+        <a class="modal-num" href="tel:100">
+          <span class="num-icon">💜</span>
+          <div class="num-info">
+            <div class="num-label">Línea 100</div>
+            <div class="num-desc">Violencia familiar · gratuita · 24h</div>
+          </div>
+        </a>
+        <a class="modal-num" href="tel:105">
+          <span class="num-icon">🚔</span>
+          <div class="num-info">
+            <div class="num-label">105 — Policía Nacional</div>
+            <div class="num-desc">Emergencias inmediatas</div>
+          </div>
+        </a>
+        <a class="modal-num" href="tel:116">
+          <span class="num-icon">🧡</span>
+          <div class="num-info">
+            <div class="num-label">116 — Línea de la Vida</div>
+            <div class="num-desc">Apoyo emocional y crisis</div>
+          </div>
+        </a>
+      </div>
+      <button class="modal-close" onclick="closeModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <!-- Header -->
   <header>
-    <button class="back-btn" onclick="history.back()">‹</button>
-    <span class="icono-header">💬</span>
-    <h2>Chat de apoyo</h2>
+    <button class="back-btn">‹</button>
+    <div class="avatar">💜</div>
+    <div class="header-info">
+      <h2>Asesora de Apoyo</h2>
+      <div class="status"><span class="status-dot"></span> En línea ahora</div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-btn" onclick="openModal()" title="Emergencias">🆘</button>
+      <button class="icon-btn" title="Información">ℹ️</button>
+    </div>
   </header>
 
-  <div class="contenido" style="height: 680px;">
-
-    <div class="chat-area" id="chat-area">
-      <div class="burbuja asesor">
-        Hola, soy tu asesora de apoyo. Estoy aquí para escucharte. ¿En qué puedo ayudarte hoy?
-      </div>
+  <!-- Emergency banner -->
+  <div class="banner" onclick="openModal()">
+    <span class="banner-icon">🚨</span>
+    <div class="banner-text">
+      <b>¿Estás en peligro ahora mismo?</b>
+      <span>Toca aquí para ver líneas de emergencia</span>
     </div>
-
-    <div class="chat-input">
-      <input type="text" id="input-msg" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter') enviarMensaje()">
-      <button onclick="enviarMensaje()">Enviar</button>
-    </div>
-
+    <span class="banner-arrow">›</span>
   </div>
+
+  <!-- Chat -->
+  <div class="chat-area" id="chat-area">
+    <div class="date-sep">Hoy</div>
+    <!-- Initial message injected by JS -->
+  </div>
+
+  <!-- Quick replies -->
+  <div class="quick-replies" id="quick-replies">
+    <button class="qr-pill" onclick="sendQuick('Necesito ayuda')">Necesito ayuda</button>
+    <button class="qr-pill" onclick="sendQuick('Me siento sola/o')">Me siento sola/o</button>
+    <button class="qr-pill" onclick="sendQuick('¿Dónde puedo refugiarme?')">Refugio seguro</button>
+    <button class="qr-pill" onclick="sendQuick('¿Es confidencial?')">¿Es confidencial?</button>
+    <button class="qr-pill" onclick="sendQuick('Tengo miedo')">Tengo miedo</button>
+  </div>
+
+  <!-- Input -->
+  <div class="input-bar">
+    <div class="input-wrap">
+      <input id="msg-input" type="text" placeholder="Escribe tu mensaje…"
+             autocomplete="off"
+             onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="emoji-btn">🙂</button>
+    </div>
+    <button class="send-btn" onclick="sendMessage()">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+    </button>
+  </div>
+
 </div>
 
 <script>
-  const respuestas = [
-    "Entiendo cómo te sientes. Estás en un lugar seguro.",
-    "Gracias por contarme. ¿Hay algo específico que necesites ahora mismo?",
-    "Tu seguridad es lo más importante. ¿Estás en un lugar seguro en este momento?",
-    "Recuerda que puedes llamar a la Línea 100 en cualquier momento.",
-    "No estás sola/o. Tenemos recursos disponibles para ayudarte."
-  ];
+  // ─── helpers ───────────────────────────────────────────
+  function now() {
+    return new Date().toLocaleTimeString('es', { hour:'2-digit', minute:'2-digit' });
+  }
 
-  let rIdx = 0;
+  function addMessage(text, who) {
+    const area = document.getElementById('chat-area');
+    const wrap = document.createElement('div');
+    wrap.className = `msg ${who}`;
 
-  function enviarMensaje() {
-    const input = document.getElementById("input-msg");
-    const texto = input.value.trim();
-    if (!texto) return;
+    if (who === 'ai') {
+      wrap.innerHTML = `
+        <div class="bubble-avatar">💜</div>
+        <div>
+          <div class="bubble">${text}</div>
+          <div class="bubble-time">${now()}</div>
+        </div>`;
+    } else {
+      wrap.innerHTML = `
+        <div>
+          <div class="bubble">${text}</div>
+          <div class="bubble-time">${now()}</div>
+        </div>`;
+    }
 
-    const area = document.getElementById("chat-area");
+    area.appendChild(wrap);
+    area.scrollTop = area.scrollHeight;
+    return wrap;
+  }
 
-    const mio = document.createElement("div");
-    mio.className = "burbuja usuario";
-    mio.textContent = texto;
-    area.appendChild(mio);
-
-    input.value = "";
-
-    setTimeout(() => {
-      const resp = document.createElement("div");
-      resp.className = "burbuja asesor";
-      resp.textContent = respuestas[rIdx % respuestas.length];
-      area.appendChild(resp);
-      rIdx++;
-      area.scrollTop = area.scrollHeight;
-    }, 800);
-
+  function showTyping() {
+    const area = document.getElementById('chat-area');
+    const t = document.createElement('div');
+    t.id = 'typing-indicator';
+    t.className = 'msg ai';
+    t.innerHTML = `
+      <div class="bubble-avatar">💜</div>
+      <div class="typing-bubble">
+        <span></span><span></span><span></span>
+      </div>`;
+    area.appendChild(t);
     area.scrollTop = area.scrollHeight;
   }
-</script>
 
+  function hideTyping() {
+    const t = document.getElementById('typing-indicator');
+    if (t) t.remove();
+  }
+
+  // ─── history & state ────────────────────────────────────
+  const SYSTEM = `Eres una asesora de apoyo empática y profesional de "Red Segura", una organización que ayuda a personas en situaciones de violencia doméstica y familiar en Perú.
+
+REGLAS:
+- Responde SIEMPRE en español, con calidez y sin juzgar.
+- Mantén la conversación enfocada en el bienestar emocional y la seguridad de la persona.
+- Si hay peligro inmediato, recomienda llamar al 105 (Policía) o Línea 100.
+- Línea 100: gratuita, 24h, confidencial, orientación en violencia familiar.
+- Nunca ofrezcas asesoría legal o médica detallada; sugiere profesionales.
+- Respuestas cortas y cálidas (2-4 oraciones máximo).
+- Nunca menciones que eres una IA, mantendrás el personaje de asesora humana.
+- Si preguntan si es confidencial: sí, la conversación es privada.`;
+
+  let history = [];
+
+  async function callClaude(userMsg) {
+    history.push({ role: 'user', content: userMsg });
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: SYSTEM,
+        messages: history
+      })
+    });
+
+    const data = await res.json();
+    const reply = data.content?.[0]?.text || 'Estoy aquí contigo. Por favor escríbeme de nuevo.';
+    history.push({ role: 'assistant', content: reply });
+    return reply;
+  }
+
+  // ─── send ───────────────────────────────────────────────
+  async function sendMessage() {
+    const input = document.getElementById('msg-input');
+    const text = input.value.trim();
+    if (!text) return;
+
+    input.value = '';
+    addMessage(text, 'me');
+
+    // hide quick replies after first message
+    document.getElementById('quick-replies').style.display = 'none';
+
+    showTyping();
+    try {
+      const reply = await callClaude(text);
+      hideTyping();
+      addMessage(reply, 'ai');
+    } catch (e) {
+      hideTyping();
+      addMessage('Hubo un problema de conexión. Puedes llamar a la Línea 100 directamente: es gratuita y confidencial.', 'ai');
+    }
+  }
+
+  function sendQuick(text) {
+    document.getElementById('msg-input').value = text;
+    sendMessage();
+  }
+
+  // ─── modal ──────────────────────────────────────────────
+  function openModal() { document.getElementById('modal').classList.add('show'); }
+  function closeModal() { document.getElementById('modal').classList.remove('show'); }
+  document.getElementById('modal').addEventListener('click', e => {
+    if (e.target === document.getElementById('modal')) closeModal();
+  });
+
+  // ─── init greeting ──────────────────────────────────────
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      const greeting = 'Hola 💜 Soy tu asesora de apoyo en Red Segura. Este es un espacio seguro y confidencial. ¿En qué puedo acompañarte hoy?';
+      addMessage(greeting, 'ai');
+      history.push({ role: 'assistant', content: greeting });
+    }, 400);
+  });
+</script>
 </body>
 </html>
