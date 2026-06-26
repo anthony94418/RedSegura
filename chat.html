@@ -45,54 +45,38 @@
 
     <div class="chat-input">
       <input type="text" id="input-msg" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter') enviarMensaje()">
-      <button onclick="enviarMensaje()">Enviar</button>
+      <button id="btn-enviar" onclick="enviarMensaje()">Enviar</button>
     </div>
 
   </div>
 </div>
 
 <script>
-  // Si quieres conectar una IA real, define esta URL con tu backend o servicio compatible.
-  // Ejemplo: https://tu-backend.com/api/chat
-  const AI_ENDPOINT = "";
-  const AI_SYSTEM_PROMPT = "Eres una asesora de apoyo empática y segura. Responde con tacto, claridad y sin juzgar. Si el usuario menciona una emergencia, recomienda buscar ayuda inmediata y llamar a servicios de emergencia o a una persona de confianza.";
+  const SYSTEM_PROMPT = `Eres una asesora de apoyo empática, cálida y segura de la plataforma "Red Segura", una red de apoyo comunitario para personas en situaciones de vulnerabilidad o violencia en Perú.
 
-  const respuestas = [
-    "Entiendo cómo te sientes. Estás en un lugar seguro.",
-    "Gracias por contarme. ¿Hay algo específico que necesitas ahora mismo?",
-    "Tu seguridad es lo más importante. ¿Estás en un lugar seguro en este momento?",
-    "Recuerda que puedes llamar a la Línea 100 en cualquier momento.",
-    "No estás sola/o. Tenemos recursos disponibles para ayudarte."
-  ];
+Tu rol:
+- Escuchar con empatía, sin juzgar, respondiendo siempre en español.
+- Dar respuestas cortas y directas (máximo 3 oraciones).
+- Si la persona menciona una emergencia, violencia activa o peligro inmediato, recomendar llamar al 105 (policía) o Línea 100 de forma clara y urgente.
+- Si menciona tristeza, miedo o soledad, validar sus emociones y ofrecer apoyo.
+- Nunca dar consejos médicos ni legales específicos.
+- Siempre terminar con una pregunta abierta o frase de apoyo para mantener la conversación.
+- No menciones que eres una IA a menos que te lo pregunten directamente.`;
 
-  const respuestasPorTema = {
-    miedo: [
-      "Respira lentamente conmigo: inhala por 4, exhala por 6. Estoy aquí contigo.",
-      "Si te sientes insegura/o, puedes buscar ayuda inmediata y decirle a alguien cercano."
-    ],
-    ayuda: [
-      "Estoy contigo. ¿Quieres que te ayude a encontrar un recurso o alguien de confianza?",
-      "Puedo ayudarte a organizar tus próximos pasos, paso a paso."
-    ],
-    hablar: [
-      "Gracias por compartirlo. Hablar contigo ya es un paso importante.",
-      "Estoy escuchando con atención y sin juicio."
-    ]
-  };
-
-  let rIdx = 0;
+  const historial = [];
 
   function formatearHora() {
-    return new Date().toLocaleTimeString("es-PE", {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+    return new Date().toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
   }
 
   function mostrarIndicadorEscribiendo(mostrar) {
     const indicador = document.getElementById("typing-indicator");
-    if (!indicador) return;
-    indicador.style.display = mostrar ? "flex" : "none";
+    if (indicador) indicador.style.display = mostrar ? "flex" : "none";
+  }
+
+  function bloquearInput(bloquear) {
+    document.getElementById("input-msg").disabled = bloquear;
+    document.getElementById("btn-enviar").disabled = bloquear;
   }
 
   function agregarMensaje(texto, tipo) {
@@ -109,54 +93,27 @@
     enviarMensaje();
   }
 
-  function obtenerRespuestaLocal(texto) {
-    const mensaje = texto.toLowerCase();
-
-    if (mensaje.includes("asust") || mensaje.includes("miedo") || mensaje.includes("temo")) {
-      return respuestasPorTema.miedo[Math.floor(Math.random() * respuestasPorTema.miedo.length)];
-    }
-
-    if (mensaje.includes("ayuda") || mensaje.includes("urgente") || mensaje.includes("socorro")) {
-      return respuestasPorTema.ayuda[Math.floor(Math.random() * respuestasPorTema.ayuda.length)];
-    }
-
-    if (mensaje.includes("hablar") || mensaje.includes("escuchar") || mensaje.includes("solo") || mensaje.includes("triste")) {
-      return respuestasPorTema.hablar[Math.floor(Math.random() * respuestasPorTema.hablar.length)];
-    }
-
-    return respuestas[rIdx % respuestas.length];
-  }
-
   async function obtenerRespuestaIA(texto) {
-    if (!AI_ENDPOINT) return null;
+    historial.push({ role: "user", content: texto });
 
-    try {
-      const respuesta = await fetch(AI_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          message: texto,
-          systemPrompt: AI_SYSTEM_PROMPT
-        })
-      });
+    const respuesta = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6",
+        max_tokens: 1000,
+        system: SYSTEM_PROMPT,
+        messages: historial
+      })
+    });
 
-      if (!respuesta.ok) return null;
+    if (!respuesta.ok) throw new Error("Error API: " + respuesta.status);
 
-      const datos = await respuesta.json();
+    const datos = await respuesta.json();
+    const textoRespuesta = datos.content[0].text;
 
-      return (
-        datos.reply ||
-        datos.response ||
-        datos.message?.content ||
-        datos.choices?.[0]?.message?.content ||
-        null
-      );
-    } catch (error) {
-      console.warn("No se pudo usar la IA:", error);
-      return null;
-    }
+    historial.push({ role: "assistant", content: textoRespuesta });
+    return textoRespuesta;
   }
 
   async function enviarMensaje() {
@@ -166,16 +123,21 @@
 
     agregarMensaje(texto, "usuario");
     input.value = "";
+    bloquearInput(true);
     mostrarIndicadorEscribiendo(true);
 
-    const respuestaIA = await obtenerRespuestaIA(texto);
-    const respuesta = respuestaIA || obtenerRespuestaLocal(texto);
-
-    setTimeout(() => {
-      agregarMensaje(respuesta, "asesor");
-      rIdx++;
+    try {
+      const respuesta = await obtenerRespuestaIA(texto);
       mostrarIndicadorEscribiendo(false);
-    }, respuestaIA ? 600 : 900);
+      agregarMensaje(respuesta, "asesor");
+    } catch (error) {
+      mostrarIndicadorEscribiendo(false);
+      console.error("Error IA:", error);
+      agregarMensaje("Lo siento, hubo un problema al conectar. Por favor intenta de nuevo.", "asesor");
+    } finally {
+      bloquearInput(false);
+      input.focus();
+    }
   }
 </script>
 
