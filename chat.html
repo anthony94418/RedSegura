@@ -16,128 +16,57 @@
     <h2>Chat de apoyo</h2>
   </header>
 
-  <div class="contenido chat-shell">
-
-    <div class="chat-header-panel">
-      <div>
-        <span class="chat-online">● En línea</span>
-        <h3>Asesora de apoyo</h3>
-      </div>
-      <span class="chat-status">respondiendo ahora</span>
-    </div>
+  <div class="contenido" style="height: 680px;">
 
     <div class="chat-area" id="chat-area">
       <div class="burbuja asesor">
-        <span class="bubble-time">Ahora</span>
         Hola, soy tu asesora de apoyo. Estoy aquí para escucharte. ¿En qué puedo ayudarte hoy?
       </div>
     </div>
 
-    <div class="typing-indicator" id="typing-indicator">
-      <span></span><span></span><span></span>
-    </div>
-
-    <div class="quick-options">
-      <button class="quick-chip" onclick="responderRapido('Necesito ayuda ahora')">Necesito ayuda ahora</button>
-      <button class="quick-chip" onclick="responderRapido('Quiero hablar con alguien')">Quiero hablar con alguien</button>
-      <button class="quick-chip" onclick="responderRapido('Estoy asustada')">Estoy asustada</button>
-    </div>
-
     <div class="chat-input">
       <input type="text" id="input-msg" placeholder="Escribe tu mensaje..." onkeydown="if(event.key==='Enter') enviarMensaje()">
-      <button id="btn-enviar" onclick="enviarMensaje()">Enviar</button>
+      <button onclick="enviarMensaje()">Enviar</button>
     </div>
 
   </div>
 </div>
 
 <script>
-  const SYSTEM_PROMPT = `Eres una asesora de apoyo empática, cálida y segura de la plataforma "Red Segura", una red de apoyo comunitario para personas en situaciones de vulnerabilidad o violencia en Perú.
+  const respuestas = [
+    "Entiendo cómo te sientes. Estás en un lugar seguro.",
+    "Gracias por contarme. ¿Hay algo específico que necesites ahora mismo?",
+    "Tu seguridad es lo más importante. ¿Estás en un lugar seguro en este momento?",
+    "Recuerda que puedes llamar a la Línea 100 en cualquier momento.",
+    "No estás sola/o. Tenemos recursos disponibles para ayudarte."
+  ];
 
-Tu rol:
-- Escuchar con empatía, sin juzgar, respondiendo siempre en español.
-- Dar respuestas cortas y directas (máximo 3 oraciones).
-- Si la persona menciona una emergencia, violencia activa o peligro inmediato, recomendar llamar al 105 (policía) o Línea 100 de forma clara y urgente.
-- Si menciona tristeza, miedo o soledad, validar sus emociones y ofrecer apoyo.
-- Nunca dar consejos médicos ni legales específicos.
-- Siempre terminar con una pregunta abierta o frase de apoyo para mantener la conversación.
-- No menciones que eres una IA a menos que te lo pregunten directamente.`;
+  let rIdx = 0;
 
-  const historial = [];
-
-  function formatearHora() {
-    return new Date().toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" });
-  }
-
-  function mostrarIndicadorEscribiendo(mostrar) {
-    const indicador = document.getElementById("typing-indicator");
-    if (indicador) indicador.style.display = mostrar ? "flex" : "none";
-  }
-
-  function bloquearInput(bloquear) {
-    document.getElementById("input-msg").disabled = bloquear;
-    document.getElementById("btn-enviar").disabled = bloquear;
-  }
-
-  function agregarMensaje(texto, tipo) {
-    const area = document.getElementById("chat-area");
-    const burbuja = document.createElement("div");
-    burbuja.className = `burbuja ${tipo}`;
-    burbuja.innerHTML = `<span class="bubble-time">${formatearHora()}</span>${texto}`;
-    area.appendChild(burbuja);
-    area.scrollTop = area.scrollHeight;
-  }
-
-  function responderRapido(texto) {
-    document.getElementById("input-msg").value = texto;
-    enviarMensaje();
-  }
-
-  async function obtenerRespuestaIA(texto) {
-    historial.push({ role: "user", content: texto });
-
-    const respuesta = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        system: SYSTEM_PROMPT,
-        messages: historial
-      })
-    });
-
-    if (!respuesta.ok) throw new Error("Error API: " + respuesta.status);
-
-    const datos = await respuesta.json();
-    const textoRespuesta = datos.content[0].text;
-
-    historial.push({ role: "assistant", content: textoRespuesta });
-    return textoRespuesta;
-  }
-
-  async function enviarMensaje() {
+  function enviarMensaje() {
     const input = document.getElementById("input-msg");
     const texto = input.value.trim();
     if (!texto) return;
 
-    agregarMensaje(texto, "usuario");
-    input.value = "";
-    bloquearInput(true);
-    mostrarIndicadorEscribiendo(true);
+    const area = document.getElementById("chat-area");
 
-    try {
-      const respuesta = await obtenerRespuestaIA(texto);
-      mostrarIndicadorEscribiendo(false);
-      agregarMensaje(respuesta, "asesor");
-    } catch (error) {
-      mostrarIndicadorEscribiendo(false);
-      console.error("Error IA:", error);
-      agregarMensaje("Lo siento, hubo un problema al conectar. Por favor intenta de nuevo.", "asesor");
-    } finally {
-      bloquearInput(false);
-      input.focus();
-    }
+    const mio = document.createElement("div");
+    mio.className = "burbuja usuario";
+    mio.textContent = texto;
+    area.appendChild(mio);
+
+    input.value = "";
+
+    setTimeout(() => {
+      const resp = document.createElement("div");
+      resp.className = "burbuja asesor";
+      resp.textContent = respuestas[rIdx % respuestas.length];
+      area.appendChild(resp);
+      rIdx++;
+      area.scrollTop = area.scrollHeight;
+    }, 800);
+
+    area.scrollTop = area.scrollHeight;
   }
 </script>
 
